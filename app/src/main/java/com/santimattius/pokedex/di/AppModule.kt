@@ -1,0 +1,23 @@
+package com.santimattius.pokedex.di
+
+import com.santimattius.pokedex.core.networking.RetrofitServiceCreator
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+import kotlin.random.Random
+
+@Module
+@InstallIn(SingletonComponent::class)
+class AppModule {
+
+    @Provides
+    @Singleton
+    fun provideRetrofitCreator(): RetrofitServiceCreator {
+        return RetrofitServiceCreator(baseUrl = "https://www.example.com/api")
+    }
+
+    @Provides
+    fun provideRandom(): Random = Random.Default
+}

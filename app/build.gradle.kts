@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "com.santimattius.basic.skeleton"
+    namespace = "com.santimattius.pokedex"
     compileSdk = extraString("target_sdk_version").toInt()
 
     defaultConfig {
@@ -23,7 +23,7 @@ android {
         versionCode = extraString("version_code").toInt()
         versionName = extraString("version_name")
 
-        testInstrumentationRunner = "com.santimattius.basic.skeleton.HiltTestRunner"
+        testInstrumentationRunner = "com.santimattius.pokedex.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
