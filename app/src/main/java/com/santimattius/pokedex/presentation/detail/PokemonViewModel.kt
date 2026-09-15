@@ -13,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PokemonViewModel @Inject constructor(
     private val repository: PokemonRepository,
+    private val mapper: PokemonUiMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PokemonUiState>(PokemonUiState.Idle)
@@ -24,7 +25,7 @@ class PokemonViewModel @Inject constructor(
             _state.value = runCatching {
                 repository.getPokemon(name.lowercase())
             }.fold(
-                onSuccess = PokemonUiState::Content,
+                onSuccess = { pokemon -> PokemonUiState.Content(mapper.map(pokemon)) },
                 onFailure = PokemonUiState::Error,
             )
         }

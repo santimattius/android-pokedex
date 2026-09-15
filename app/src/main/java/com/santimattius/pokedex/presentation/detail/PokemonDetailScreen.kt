@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,10 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.LaunchedEffect
-import com.santimattius.pokedex.domain.Pokemon
-import com.santimattius.pokedex.domain.PokemonStat
-import com.santimattius.pokedex.domain.PokemonType
 import com.santimattius.pokedex.ui.component.BasicSkeletonContainer
+import com.santimattius.pokedex.ui.theme.containerColor
 
 internal const val DEFAULT_POKEMON_NAME = "pikachu"
 private val ContentPadding = 16.dp
@@ -72,7 +72,7 @@ private fun LoadingContent() {
 }
 
 @Composable
-private fun PokemonContent(pokemon: Pokemon) {
+private fun PokemonContent(pokemon: PokemonUiModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,9 +81,17 @@ private fun PokemonContent(pokemon: Pokemon) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(text = pokemon.name)
-        Text(text = pokemon.types.joinToString { it.name })
-        Text(text = pokemon.stats.joinToString { "${it.name}:${it.baseValue}" })
+        Text(text = pokemon.displayName)
+        Text(text = pokemon.types.joinToString { it.label })
+        pokemon.stats.forEach { stat ->
+            Text(text = "${stat.label}: ${stat.value}")
+            LinearProgressIndicator(
+                progress = { stat.progress },
+                modifier = Modifier.fillMaxWidth(),
+                color = pokemon.types.firstOrNull()?.style?.containerColor
+                    ?: PokemonTypeStyle.UNKNOWN.containerColor,
+            )
+        }
     }
 }
 
@@ -110,12 +118,16 @@ private fun PokemonDetailScreenContentPreview() {
     BasicSkeletonContainer {
         PokemonDetailScreen(
             state = PokemonUiState.Content(
-                Pokemon(
+                PokemonUiModel(
                     id = 25,
-                    name = "pikachu",
-                    officialArtworkUrl = "",
-                    types = listOf(PokemonType(name = "electric")),
-                    stats = listOf(PokemonStat(name = "hp", baseValue = 35)),
+                    displayName = "Pikachu",
+                    imageUrl = "",
+                    types = listOf(
+                        PokemonTypeUiModel(label = "ELECTRIC", style = PokemonTypeStyle.ELECTRIC),
+                    ),
+                    stats = listOf(
+                        PokemonStatUiModel(label = "Hp", value = 35, progress = 35 / 255f),
+                    ),
                 ),
             ),
             onRetry = {},
