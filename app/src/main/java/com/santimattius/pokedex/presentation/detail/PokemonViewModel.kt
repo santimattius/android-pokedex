@@ -2,8 +2,7 @@ package com.santimattius.pokedex.presentation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.santimattius.pokedex.data.remote.PokemonService
-import com.santimattius.pokedex.data.remote.toDomain
+import com.santimattius.pokedex.data.repository.PokemonRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PokemonViewModel @Inject constructor(
-    private val service: PokemonService,
+    private val repository: PokemonRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PokemonUiState>(PokemonUiState.Idle)
@@ -23,7 +22,7 @@ class PokemonViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = PokemonUiState.Loading
             _state.value = runCatching {
-                service.getPokemon(name.lowercase()).toDomain()
+                repository.getPokemon(name.lowercase())
             }.fold(
                 onSuccess = PokemonUiState::Content,
                 onFailure = PokemonUiState::Error,
