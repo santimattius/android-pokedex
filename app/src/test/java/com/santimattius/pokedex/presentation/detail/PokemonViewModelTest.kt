@@ -9,7 +9,10 @@ import com.santimattius.pokedex.data.remote.dto.StatSlotDto
 import com.santimattius.pokedex.data.remote.dto.TypeDto
 import com.santimattius.pokedex.data.remote.dto.TypeSlotDto
 import com.santimattius.pokedex.data.remote.toDomain
-import com.santimattius.pokedex.data.repository.PokemonRepository
+import com.santimattius.pokedex.domain.CaptureDifficulty
+import com.santimattius.pokedex.domain.GetPokemonProfile
+import com.santimattius.pokedex.domain.PokemonProfile
+import com.santimattius.pokedex.domain.PokemonSpecies
 import com.santimattius.pokedex.tools.rules.MainCoroutinesTestRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -41,10 +44,26 @@ class PokemonViewModelTest {
         stats = listOf(StatSlotDto(baseStat = 35, stat = StatDto("hp"))),
     )
 
+    private val pikachuSpecies = PokemonSpecies(
+        name = "pikachu",
+        habitat = "forest",
+        captureRate = 190,
+        isLegendary = false,
+        isMythical = false,
+    )
+
+    private val pikachuProfile = PokemonProfile(
+        pokemon = pikachuResponse.toDomain(),
+        species = pikachuSpecies,
+        totalBaseStats = 35,
+        captureDifficulty = CaptureDifficulty.EASY,
+        isSpecial = false,
+    )
+
     @Test
     fun `initial state is Idle`() = runTest(mainCoroutinesTestRule.testDispatcher) {
-        val repository = mockk<PokemonRepository>()
-        val viewModel = PokemonViewModel(repository, mapper)
+        val getPokemonProfile = mockk<GetPokemonProfile>()
+        val viewModel = PokemonViewModel(getPokemonProfile, mapper)
 
         assertEquals(PokemonUiState.Idle, viewModel.state.value)
     }
@@ -52,13 +71,12 @@ class PokemonViewModelTest {
     @Test
     fun `load emits Loading before Content on success`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
-            val repository = mockk<PokemonRepository> {
-                coEvery { getPokemon("pikachu") } coAnswers {
-                    delay(100)
-                    pikachuResponse.toDomain()
-                }
+            val getPokemonProfile = mockk<GetPokemonProfile>()
+            coEvery { getPokemonProfile("pikachu") } coAnswers {
+                delay(100)
+                pikachuProfile
             }
-            val viewModel = PokemonViewModel(repository, mapper)
+            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
@@ -76,30 +94,28 @@ class PokemonViewModelTest {
         }
 
     @Test
-    fun `load normalizes a mixed-case name to lowercase before calling the repository`() =
+    fun `load normalizes a mixed-case name to lowercase before calling the interactor`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
-            val repository = mockk<PokemonRepository> {
-                coEvery { getPokemon("pikachu") } returns pikachuResponse.toDomain()
-            }
-            val viewModel = PokemonViewModel(repository, mapper)
+            val getPokemonProfile = mockk<GetPokemonProfile>()
+            coEvery { getPokemonProfile("pikachu") } returns pikachuProfile
+            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
 
             viewModel.load("Pikachu")
             advanceUntilIdle()
 
-            coVerify(exactly = 1) { repository.getPokemon("pikachu") }
+            coVerify(exactly = 1) { getPokemonProfile("pikachu") }
         }
 
     @Test
-    fun `load emits Error when the repository throws`() =
+    fun `load emits Error when the interactor throws`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
             val failure = RuntimeException("not found")
-            val repository = mockk<PokemonRepository> {
-                coEvery { getPokemon("missingno") } coAnswers {
-                    delay(100)
-                    throw failure
-                }
+            val getPokemonProfile = mockk<GetPokemonProfile>()
+            coEvery { getPokemonProfile("missingno") } coAnswers {
+                delay(100)
+                throw failure
             }
-            val viewModel = PokemonViewModel(repository, mapper)
+            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
@@ -113,5 +129,21 @@ class PokemonViewModelTest {
             assertTrue(loadingIndex < errorIndex)
             val error = states.last() as PokemonUiState.Error
             assertEquals(failure, error.cause)
+        }
+
+    @Test
+    fun `load emits Content carrying totalBaseStats, captureDifficulty and isSpecial from the profile`() =
+        runTest(mainCoroutinesTestRule.testDispatcher) {
+            val getPokemonProfile = mockk<GetPokemonProfile>()
+            coEvery { getPokemonProfile("pikachu") } returns pikachuProfile
+            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+
+            viewModel.load("pikachu")
+            advanceUntilIdle()
+
+            val content = viewModel.state.value as PokemonUiState.Content
+            assertEquals(35, content.pokemon.totalBaseStats)
+            assertEquals("EASY", content.pokemon.captureDifficulty)
+            assertEquals(false, content.pokemon.isSpecial)
         }
 }
