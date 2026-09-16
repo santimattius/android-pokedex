@@ -23,7 +23,9 @@ class PokemonDetailScreenTest {
         displayName = "Pikachu",
         imageUrl = "https://example.com/25.png",
         types = listOf(PokemonTypeUiModel(label = "ELECTRIC", style = PokemonTypeStyle.ELECTRIC)),
-        stats = listOf(PokemonStatUiModel(label = "Hp", value = 35, progress = 35 / 255f)),
+        stats = listOf(
+            PokemonStatUiModel(label = "Hp", value = 35, progress = 35 / 255f, valueLabel = "35/255"),
+        ),
     )
 
     @Test
@@ -48,7 +50,8 @@ class PokemonDetailScreenTest {
         composeTestRule.onNodeWithTag(PokemonDetailTestTags.CONTENT).assertExists()
         composeTestRule.onNodeWithText("Pikachu").assertExists()
         composeTestRule.onNodeWithText("ELECTRIC").assertExists()
-        composeTestRule.onNodeWithText("Hp: 35").assertExists()
+        composeTestRule.onNodeWithText("35/255").assertExists()
+        composeTestRule.onNodeWithTag(PokemonDetailTestTags.ARTWORK).assertExists()
         composeTestRule.onNodeWithTag(PokemonDetailTestTags.LOADING).assertDoesNotExist()
     }
 

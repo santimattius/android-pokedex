@@ -29,7 +29,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         entry<PokedexRoute.Detail> { key ->
-                            PokemonDetailRoute(name = key.name)
+                            PokemonDetailRoute(
+                                name = key.name,
+                                onBack = { backStack.removeLastOrNull() },
+                            )
                         }
                     },
                 )
