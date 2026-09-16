@@ -11,8 +11,11 @@ import com.santimattius.pokedex.data.remote.dto.PokemonResponse
 import com.santimattius.pokedex.data.remote.dto.SpritesDto
 import com.santimattius.pokedex.data.remote.dto.StatDto
 import com.santimattius.pokedex.data.remote.dto.StatSlotDto
+import com.santimattius.pokedex.data.remote.dto.PokemonPageItem
+import com.santimattius.pokedex.data.remote.dto.PokemonPageResponse
 import com.santimattius.pokedex.data.remote.dto.TypeDto
 import com.santimattius.pokedex.data.remote.dto.TypeSlotDto
+import androidx.paging.testing.asSnapshot
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -118,5 +121,26 @@ class PokemonRepositoryTest {
         }
 
         assertEquals(failure.message, thrown.message)
+    }
+
+    @Test
+    fun `pokemonPage streams mapped summaries paged through PokemonPagingSource`() = runTest {
+        val service = mockk<PokemonService> {
+            coEvery { getPokemonPage(limit = 20, offset = 0) } returns PokemonPageResponse(
+                count = 1,
+                next = null,
+                previous = null,
+                results = listOf(
+                    PokemonPageItem(name = "pikachu", url = "https://pokeapi.co/api/v2/pokemon/25/"),
+                ),
+            )
+        }
+        val dao = mockk<PokemonDao>()
+        val repository = PokemonRepository(service, dao, fixedClock, gson)
+
+        val snapshot = repository.pokemonPage().asSnapshot()
+
+        assertEquals(listOf(25), snapshot.map { it.id })
+        assertEquals(listOf("pikachu"), snapshot.map { it.name })
     }
 }
