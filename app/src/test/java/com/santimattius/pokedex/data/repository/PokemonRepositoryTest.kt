@@ -40,6 +40,8 @@ class PokemonRepositoryTest {
     private val pikachuResponse = PokemonResponse(
         id = 25,
         name = "pikachu",
+        weight = 60,
+        height = 4,
         sprites = SpritesDto(OtherSpritesDto(OfficialArtworkDto("https://example.com/25.png"))),
         types = listOf(TypeSlotDto(TypeDto("electric"))),
         stats = listOf(StatSlotDto(baseStat = 35, stat = StatDto("hp"))),

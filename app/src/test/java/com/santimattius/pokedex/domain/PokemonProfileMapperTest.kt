@@ -12,6 +12,8 @@ class PokemonProfileMapperTest {
             id = 25,
             name = "pikachu",
             officialArtworkUrl = "https://example.com/25.png",
+            weightKg = 6.0,
+            heightM = 0.4,
             types = listOf(PokemonType("electric")),
             stats = stats,
         )

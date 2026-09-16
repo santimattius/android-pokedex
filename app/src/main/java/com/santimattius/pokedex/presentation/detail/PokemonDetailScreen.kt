@@ -89,8 +89,7 @@ private fun PokemonContent(pokemon: PokemonUiModel) {
             LinearProgressIndicator(
                 progress = { stat.progress },
                 modifier = Modifier.fillMaxWidth(),
-                color = pokemon.types.firstOrNull()?.style?.containerColor
-                    ?: PokemonTypeStyle.UNKNOWN.containerColor,
+                color = pokemon.primaryStyle.containerColor,
             )
         }
     }

@@ -13,5 +13,6 @@ class PokemonListUiMapper @Inject constructor() {
         name = summary.name,
         displayName = summary.name.replaceFirstChar(Char::uppercase),
         imageUrl = ARTWORK_URL_TEMPLATE.format(summary.id),
+        accentStyle = accentStyleFor(summary.id),
     )
 }
