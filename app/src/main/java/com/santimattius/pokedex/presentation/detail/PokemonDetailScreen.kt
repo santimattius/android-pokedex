@@ -35,12 +35,13 @@ object PokemonDetailTestTags {
 
 @Composable
 fun PokemonDetailRoute(
+    name: String = DEFAULT_POKEMON_NAME,
     viewModel: PokemonViewModel = hiltViewModel<PokemonViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val load = { viewModel.load(DEFAULT_POKEMON_NAME) }
+    val load = { viewModel.load(name) }
 
-    LaunchedEffect(Unit) { load() }
+    LaunchedEffect(name) { load() }
 
     PokemonDetailScreen(
         state = state,
