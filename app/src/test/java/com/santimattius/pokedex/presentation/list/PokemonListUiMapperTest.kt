@@ -33,6 +33,15 @@ class PokemonListUiMapperTest {
     }
 
     @Test
+    fun `map resolves accentStyle deterministically from the summary id`() {
+        val summary = PokemonSummary(id = 25, name = "pikachu")
+
+        val result = mapper.map(summary)
+
+        assertEquals(accentStyleFor(25), result.accentStyle)
+    }
+
+    @Test
     fun `map never exposes type or stat fields`() {
         val summary = PokemonSummary(id = 1, name = "bulbasaur")
 

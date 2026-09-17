@@ -4,6 +4,8 @@ data class PokemonUiModel(
     val id: Int,
     val displayName: String,
     val imageUrl: String,
+    val weightLabel: String = "",
+    val heightLabel: String = "",
     val types: List<PokemonTypeUiModel>,
     val stats: List<PokemonStatUiModel>,
     val totalBaseStats: Int = 0,
@@ -20,4 +22,8 @@ data class PokemonStatUiModel(
     val label: String,
     val value: Int,
     val progress: Float,
+    val valueLabel: String = "",
 )
+
+internal val PokemonUiModel.primaryStyle: PokemonTypeStyle
+    get() = types.firstOrNull()?.style ?: PokemonTypeStyle.UNKNOWN

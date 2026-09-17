@@ -7,10 +7,15 @@ import com.santimattius.pokedex.domain.Pokemon
 import com.santimattius.pokedex.domain.PokemonStat
 import com.santimattius.pokedex.domain.PokemonType
 
+private const val HECTOGRAMS_PER_KILOGRAM = 10.0
+private const val DECIMETRES_PER_METRE = 10.0
+
 fun PokemonResponse.toDomain(): Pokemon = Pokemon(
     id = id,
     name = name,
     officialArtworkUrl = sprites.other.officialArtwork.frontDefault,
+    weightKg = weight / HECTOGRAMS_PER_KILOGRAM,
+    heightM = height / DECIMETRES_PER_METRE,
     types = types.map(TypeSlotDto::toDomain),
     stats = stats.map(StatSlotDto::toDomain),
 )

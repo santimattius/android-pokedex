@@ -4,6 +4,8 @@ data class Pokemon(
     val id: Int,
     val name: String,
     val officialArtworkUrl: String,
+    val weightKg: Double,
+    val heightM: Double,
     val types: List<PokemonType>,
     val stats: List<PokemonStat>,
 )

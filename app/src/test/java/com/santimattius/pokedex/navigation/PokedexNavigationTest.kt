@@ -18,6 +18,7 @@ import com.santimattius.pokedex.presentation.detail.PokemonStatUiModel
 import com.santimattius.pokedex.presentation.detail.PokemonUiModel
 import com.santimattius.pokedex.presentation.detail.PokemonUiState
 import com.santimattius.pokedex.presentation.list.PokemonListItemUiModel
+import com.santimattius.pokedex.presentation.list.accentStyleFor
 import com.santimattius.pokedex.presentation.list.PokemonListScreen
 import com.santimattius.pokedex.presentation.list.PokemonListTestTags
 import com.santimattius.pokedex.ui.component.BasicSkeletonContainer
@@ -38,6 +39,7 @@ class PokedexNavigationTest {
         name = "pikachu",
         displayName = "Pikachu",
         imageUrl = "https://example.com/25.png",
+        accentStyle = accentStyleFor(25),
     )
 
     private fun uiModelFor(name: String): PokemonUiModel = PokemonUiModel(

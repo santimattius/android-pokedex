@@ -1,6 +1,8 @@
 {
   "id": 25,
   "name": "pikachu",
+  "weight": 60,
+  "height": 4,
   "sprites": {
     "other": {
       "official-artwork": {

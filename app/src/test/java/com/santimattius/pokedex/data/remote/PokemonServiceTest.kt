@@ -88,5 +88,7 @@ class PokemonServiceTest {
         )
         assertThat(pokemon.types.map { it.name }, equalTo(listOf("electric")))
         assertThat(pokemon.stats.map { it.name to it.baseValue }, equalTo(listOf("hp" to 35, "attack" to 55)))
+        assertThat(pokemon.weightKg, equalTo(6.0))
+        assertThat(pokemon.heightM, equalTo(0.4))
     }
 }
