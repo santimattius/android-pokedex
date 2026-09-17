@@ -28,6 +28,19 @@ The project follows modern Android development patterns:
 - **Image Loading**: Coil for efficient image loading in Compose.
 - **Layering**: `data` (remote DTOs/services/repositories, local Room cache) → `domain` (pure models + `GetPokemonProfile` interactor) → `presentation` (per-screen UI models, mappers, ViewModels, Composables).
 
+## 🗺 Implementation Stages
+
+Built as a staged, spec-driven (SDD) implementation on top of the base skeleton, one capability per stage, each independently tested and shipped:
+
+| Stage | Capability | What it added |
+| :--- | :--- | :--- |
+| 1 | `pokemon-detail` | Package rename to `com.santimattius.pokedex`; remote Pokémon detail lookup (Retrofit + PokéAPI), domain model, detail ViewModel/Composable. |
+| 2 | `pokemon-offline-cache` | Room-backed local cache for Pokémon detail with a 24h freshness window and silent fallback on network failure. |
+| 3 | `pokemon-profile` (UI mapping) | Pure UI mapper/model layer between domain and Compose (`PokemonUiMapper`, `PokemonTypeStyle`), decoupling the screen from raw domain types. |
+| 4 | `pokemon-profile` (aggregation) | Species data + concurrent detail/species fetch (`GetPokemonProfile`), capture difficulty, legendary/mythical flag, total base stats. |
+| 5 | `pokemon-catalog` | Paginated Pokémon list (Paging 3) and Navigation 3 wiring between list and detail. |
+| 6 | UI polish | Weight/height display, type-tinted detail header and chips, decorative list-card accent colors, and Coil artwork rendering (previously unused). |
+
 ## 🛠 Project Structure
 
 ```text
