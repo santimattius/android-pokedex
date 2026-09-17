@@ -65,7 +65,7 @@ class PokemonViewModelTest {
     @Test
     fun `initial state is Idle`() = runTest(mainCoroutinesTestRule.testDispatcher) {
         val getPokemonProfile = mockk<GetPokemonProfile>()
-        val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+        val viewModel = PokemonViewModel("pikachu", getPokemonProfile, mapper)
 
         assertEquals(PokemonUiState.Idle, viewModel.state.value)
     }
@@ -78,12 +78,11 @@ class PokemonViewModelTest {
                 delay(100)
                 pikachuProfile
             }
-            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+            val viewModel = PokemonViewModel("pikachu", getPokemonProfile, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
 
-            viewModel.load("pikachu")
             advanceUntilIdle()
             job.cancel()
 
@@ -100,10 +99,11 @@ class PokemonViewModelTest {
         runTest(mainCoroutinesTestRule.testDispatcher) {
             val getPokemonProfile = mockk<GetPokemonProfile>()
             coEvery { getPokemonProfile("pikachu") } returns pikachuProfile
-            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+            val viewModel = PokemonViewModel("Pikachu", getPokemonProfile, mapper)
 
-            viewModel.load("Pikachu")
+            val job = launch { viewModel.state.collect {} }
             advanceUntilIdle()
+            job.cancel()
 
             coVerify(exactly = 1) { getPokemonProfile("pikachu") }
         }
@@ -117,12 +117,11 @@ class PokemonViewModelTest {
                 delay(100)
                 throw failure
             }
-            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+            val viewModel = PokemonViewModel("missingno", getPokemonProfile, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
 
-            viewModel.load("missingno")
             advanceUntilIdle()
             job.cancel()
 
@@ -138,14 +137,31 @@ class PokemonViewModelTest {
         runTest(mainCoroutinesTestRule.testDispatcher) {
             val getPokemonProfile = mockk<GetPokemonProfile>()
             coEvery { getPokemonProfile("pikachu") } returns pikachuProfile
-            val viewModel = PokemonViewModel(getPokemonProfile, mapper)
+            val viewModel = PokemonViewModel("pikachu", getPokemonProfile, mapper)
 
-            viewModel.load("pikachu")
+            val job = launch { viewModel.state.collect {} }
             advanceUntilIdle()
+            job.cancel()
 
             val content = viewModel.state.value as PokemonUiState.Content
             assertEquals(35, content.pokemon.totalBaseStats)
             assertEquals("EASY", content.pokemon.captureDifficulty)
             assertEquals(false, content.pokemon.isSpecial)
+        }
+
+    @Test
+    fun `refresh re-invokes the interactor with the same name`() =
+        runTest(mainCoroutinesTestRule.testDispatcher) {
+            val getPokemonProfile = mockk<GetPokemonProfile>()
+            coEvery { getPokemonProfile("pikachu") } returns pikachuProfile
+            val viewModel = PokemonViewModel("pikachu", getPokemonProfile, mapper)
+
+            val job = launch { viewModel.state.collect {} }
+            advanceUntilIdle()
+            viewModel.refresh()
+            advanceUntilIdle()
+            job.cancel()
+
+            coVerify(exactly = 2) { getPokemonProfile("pikachu") }
         }
 }

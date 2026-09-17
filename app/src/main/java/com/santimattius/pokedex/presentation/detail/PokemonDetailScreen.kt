@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.santimattius.pokedex.ui.component.BasicSkeletonContainer
@@ -44,8 +43,8 @@ object PokemonDetailTestTags {
 
 @Composable
 fun PokemonDetailRoute(
+    viewModel: PokemonViewModel,
     onBack: () -> Unit = {},
-    viewModel: PokemonViewModel = hiltViewModel<PokemonViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
