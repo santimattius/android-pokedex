@@ -5,7 +5,7 @@
 [![AGP 9.4.0](https://img.shields.io/badge/AGP-9.4.0-blue.svg)](https://developer.android.com/build/releases/gradle-plugin)
 [![Kotlin 2.4.20](https://img.shields.io/badge/Kotlin-2.4.20-purple.svg)](https://kotlinlang.org/docs/whatsnew20.html)
 
-A Pokédex Android app built on top of a production-ready Kotlin/Compose skeleton, consuming [PokéAPI](https://pokeapi.co/) to browse and inspect Pokémon. Built as a staged, spec-driven implementation (see `docs/spec-example-mva.md`) with strict TDD across every layer.
+A Pokédex Android app built on top of a production-ready Kotlin/Compose skeleton, consuming [PokéAPI](https://pokeapi.co/) to browse and inspect Pokémon. Built as a staged, spec-driven implementation with strict TDD across every layer.
 
 ## 🚀 Key Features
 
@@ -39,7 +39,6 @@ The project follows modern Android development patterns:
 │   └── build.gradle.kts  # App-specific build configuration (incl. Jacoco)
 ├── config/               # Configuration files (Detekt, etc.)
 ├── docs/
-│   ├── spec-example-mva.md # Pokedex MVA staged spec (source of the pokedex-mva SDD change)
 │   └── testing.md        # Testing strategy: analysis, plan, and what's implemented
 ├── gradle/               # Gradle scripts and version catalog
 │   └── libs.versions.toml # Centralized dependency management
