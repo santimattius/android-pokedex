@@ -1,15 +1,18 @@
-# Android Basic Skeleton
+# Android Pokedex
 
 [![Codecov](https://codecov.io/gh/santimattius/android-basic-skeleton/branch/master/graph/badge.svg?token=HNW9TXKMQU)](https://codecov.io/gh/santimattius/android-basic-skeleton)
 [![Quality Checks](https://github.com/santimattius/android-basic-skeleton/actions/workflows/main.yml/badge.svg)](https://github.com/santimattius/android-basic-skeleton/actions)
 [![AGP 9.4.0](https://img.shields.io/badge/AGP-9.4.0-blue.svg)](https://developer.android.com/build/releases/gradle-plugin)
 [![Kotlin 2.4.20](https://img.shields.io/badge/Kotlin-2.4.20-purple.svg)](https://kotlinlang.org/docs/whatsnew20.html)
 
-A production-ready Android skeleton project featuring modern architecture, essential build configurations, and automated quality checks. Designed to accelerate the development of high-quality Android applications.
+A Pokédex Android app built on top of a production-ready Kotlin/Compose skeleton, consuming [PokéAPI](https://pokeapi.co/) to browse and inspect Pokémon. Built as a staged, spec-driven implementation (see `docs/spec-example-mva.md`) with strict TDD across every layer.
 
 ## 🚀 Key Features
 
-- **Modern Tech Stack**: Jetpack Compose, Hilt, Coroutines, and Flow.
+- **Pokémon catalog**: paginated list (Jetpack Paging 3) with a decorative per-item accent color, artwork via Coil.
+- **Pokémon detail**: type-tinted header, weight/height, base stats with progress bars, capture difficulty and legendary/mythical flags aggregated from PokéAPI's detail + species endpoints.
+- **Offline-first detail cache**: Room-backed 24h freshness cache — a previously viewed Pokémon stays available (and falls back silently on network failure) once cached.
+- **Modern Tech Stack**: Jetpack Compose, Navigation 3, Hilt (incl. assisted injection), Coroutines/Flow, Paging 3, Room.
 - **Robust Networking**: Retrofit with Gson and OkHttp integration.
 - **Built-in Quality Control**: Integrated Detekt for static analysis and Jacoco for code coverage.
 - **AGP 9.0+ Ready**: Configured with the latest Android Gradle Plugin defaults, including built-in Kotlin support and New DSL interfaces.
@@ -18,22 +21,25 @@ A production-ready Android skeleton project featuring modern architecture, essen
 ## 🏗 Architecture & Design
 
 The project follows modern Android development patterns:
-- **Dependency Injection**: Hilt for compile-time safe DI.
-- **UI Framework**: 100% Jetpack Compose for a reactive UI.
-- **Asynchronous Programming**: Kotlin Coroutines and Flow for seamless data handling.
+- **Dependency Injection**: Hilt for compile-time safe DI (incl. `@AssistedInject` for the detail ViewModel, which takes the navigated Pokémon name at creation time).
+- **UI Framework**: 100% Jetpack Compose for a reactive UI, navigated with Navigation 3.
+- **Asynchronous Programming**: Kotlin Coroutines and Flow for seamless data handling; concurrent detail+species fetch via `coroutineScope { async }`.
+- **Persistence**: Room for the offline detail cache, with `java.time` support via core library desugaring.
 - **Image Loading**: Coil for efficient image loading in Compose.
+- **Layering**: `data` (remote DTOs/services/repositories, local Room cache) → `domain` (pure models + `GetPokemonProfile` interactor) → `presentation` (per-screen UI models, mappers, ViewModels, Composables).
 
 ## 🛠 Project Structure
 
 ```text
 ├── app/                  # Main application module
-│   ├── src/main/java/    # Source code (Hilt DI, UI Components, ViewModels)
+│   ├── src/main/java/    # Source code (data/domain/presentation layers, Hilt DI, Navigation 3)
 │   ├── src/test/         # Unit + Robolectric tests
 │   ├── src/androidTest/  # Instrumented tests (Hilt, device-only)
 │   ├── src/screenshotTest/ # Compose Preview Screenshot tests
 │   └── build.gradle.kts  # App-specific build configuration (incl. Jacoco)
 ├── config/               # Configuration files (Detekt, etc.)
 ├── docs/
+│   ├── spec-example-mva.md # Pokedex MVA staged spec (source of the pokedex-mva SDD change)
 │   └── testing.md        # Testing strategy: analysis, plan, and what's implemented
 ├── gradle/               # Gradle scripts and version catalog
 │   └── libs.versions.toml # Centralized dependency management
@@ -113,11 +119,17 @@ The project uses the `secrets-gradle-plugin`. To define API keys or sensitive da
 
 | Category | Libraries |
 | :--- | :--- |
-| **UI** | Jetpack Compose (BOM), Material 3, Coil |
-| **DI** | Hilt |
+| **UI** | Jetpack Compose (BOM), Material 3, Navigation 3, Coil |
+| **DI** | Hilt (incl. assisted injection) |
 | **Async** | Coroutines, Flow |
 | **Networking** | Retrofit, Gson, OkHttp |
+| **Persistence** | Room, core library desugaring |
+| **Pagination** | Paging 3 |
 | **Testing** | JUnit 4, MockK, MockWebServer, Robolectric, Hilt Testing, Compose Test, Compose Preview Screenshot Testing, Jacoco |
+
+## 🎮 Data Source
+
+Pokémon data is fetched live from [PokéAPI](https://pokeapi.co/) (`https://pokeapi.co/api/v2/`) — no API key required.
 
 ---
 Maintainer: [Santiago Mattiauda](https://github.com/santimattius)
