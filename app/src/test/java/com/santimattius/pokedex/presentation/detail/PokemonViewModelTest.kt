@@ -1,6 +1,5 @@
 package com.santimattius.pokedex.presentation.detail
 
-import com.santimattius.pokedex.data.remote.PokemonService
 import com.santimattius.pokedex.data.remote.dto.OfficialArtworkDto
 import com.santimattius.pokedex.data.remote.dto.OtherSpritesDto
 import com.santimattius.pokedex.data.remote.dto.PokemonResponse
@@ -9,6 +8,8 @@ import com.santimattius.pokedex.data.remote.dto.StatDto
 import com.santimattius.pokedex.data.remote.dto.StatSlotDto
 import com.santimattius.pokedex.data.remote.dto.TypeDto
 import com.santimattius.pokedex.data.remote.dto.TypeSlotDto
+import com.santimattius.pokedex.data.remote.toDomain
+import com.santimattius.pokedex.data.repository.PokemonRepository
 import com.santimattius.pokedex.tools.rules.MainCoroutinesTestRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -40,8 +41,8 @@ class PokemonViewModelTest {
 
     @Test
     fun `initial state is Idle`() = runTest(mainCoroutinesTestRule.testDispatcher) {
-        val service = mockk<PokemonService>()
-        val viewModel = PokemonViewModel(service)
+        val repository = mockk<PokemonRepository>()
+        val viewModel = PokemonViewModel(repository)
 
         assertEquals(PokemonUiState.Idle, viewModel.state.value)
     }
@@ -49,13 +50,13 @@ class PokemonViewModelTest {
     @Test
     fun `load emits Loading before Content on success`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
-            val service = mockk<PokemonService> {
+            val repository = mockk<PokemonRepository> {
                 coEvery { getPokemon("pikachu") } coAnswers {
                     delay(100)
-                    pikachuResponse
+                    pikachuResponse.toDomain()
                 }
             }
-            val viewModel = PokemonViewModel(service)
+            val viewModel = PokemonViewModel(repository)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
@@ -73,30 +74,30 @@ class PokemonViewModelTest {
         }
 
     @Test
-    fun `load normalizes a mixed-case name to lowercase before calling the service`() =
+    fun `load normalizes a mixed-case name to lowercase before calling the repository`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
-            val service = mockk<PokemonService> {
-                coEvery { getPokemon("pikachu") } returns pikachuResponse
+            val repository = mockk<PokemonRepository> {
+                coEvery { getPokemon("pikachu") } returns pikachuResponse.toDomain()
             }
-            val viewModel = PokemonViewModel(service)
+            val viewModel = PokemonViewModel(repository)
 
             viewModel.load("Pikachu")
             advanceUntilIdle()
 
-            coVerify(exactly = 1) { service.getPokemon("pikachu") }
+            coVerify(exactly = 1) { repository.getPokemon("pikachu") }
         }
 
     @Test
-    fun `load emits Error when the service throws`() =
+    fun `load emits Error when the repository throws`() =
         runTest(mainCoroutinesTestRule.testDispatcher) {
             val failure = RuntimeException("not found")
-            val service = mockk<PokemonService> {
+            val repository = mockk<PokemonRepository> {
                 coEvery { getPokemon("missingno") } coAnswers {
                     delay(100)
                     throw failure
                 }
             }
-            val viewModel = PokemonViewModel(service)
+            val viewModel = PokemonViewModel(repository)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
