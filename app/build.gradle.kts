@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.google.secrets.gradle.plugin)
     alias(libs.plugins.automattic.measure.builds)
     alias(libs.plugins.screenshot)
+    alias(libs.plugins.kotlin.serialization)
     jacoco
 }
 
@@ -153,6 +154,7 @@ dependencies {
 
     implementation(libs.bundles.coroutine)
     testImplementation(libs.coroutine.test)
+    testImplementation(libs.paging.testing)
     implementation(libs.bundles.retrofit)
     implementation(libs.gson.core)
     testImplementation(libs.mockwebserver)
@@ -168,6 +170,13 @@ dependencies {
     ksp(libs.room.compiler)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
+
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.kotlinx.serialization.core)
 
     debugImplementation(libs.leakcanary.android)
 
