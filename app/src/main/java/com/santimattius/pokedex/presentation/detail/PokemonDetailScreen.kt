@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,18 +44,14 @@ object PokemonDetailTestTags {
 
 @Composable
 fun PokemonDetailRoute(
-    name: String = DEFAULT_POKEMON_NAME,
     onBack: () -> Unit = {},
     viewModel: PokemonViewModel = hiltViewModel<PokemonViewModel>(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val load = { viewModel.load(name) }
-
-    LaunchedEffect(name) { load() }
 
     PokemonDetailScreen(
         state = state,
-        onRetry = load,
+        onRetry = viewModel::refresh,
         onBack = onBack,
     )
 }
@@ -98,6 +92,8 @@ private fun PokemonContent(pokemon: PokemonUiModel, onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(ContentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(ContentPadding),
         ) {
             TypeChips(pokemon)
             WeightHeightRow(pokemon)
@@ -109,23 +105,13 @@ private fun PokemonContent(pokemon: PokemonUiModel, onBack: () -> Unit) {
 
 @Composable
 private fun PokemonHeader(pokemon: PokemonUiModel, onBack: () -> Unit) {
-    Box(
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(pokemon.primaryStyle.containerColor),
-        contentAlignment = Alignment.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(ContentPadding),
-        ) {
-            IconButton(onClick = onBack) {
-                Text(text = "<")
-            }
-            Text(text = pokemon.displayName)
-            Text(text = "#${pokemon.id}")
-        }
         AsyncImage(
             model = pokemon.imageUrl,
             contentDescription = pokemon.displayName,
@@ -133,7 +119,11 @@ private fun PokemonHeader(pokemon: PokemonUiModel, onBack: () -> Unit) {
                 .size(ArtworkSize)
                 .testTag(PokemonDetailTestTags.ARTWORK),
         )
+        Text(text = pokemon.displayName)
+        Text(text = "#${pokemon.id}")
     }
+
+
 }
 
 @Composable
@@ -176,13 +166,15 @@ private fun StatRow(stat: PokemonStatUiModel, style: PokemonTypeStyle) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround,
     ) {
         Text(text = stat.label)
         LinearProgressIndicator(
             progress = { stat.progress },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = ChipPadding),
+                .padding(horizontal = ChipPadding)
+                .weight(1f),
             color = style.containerColor,
         )
         Text(text = stat.valueLabel)
@@ -222,7 +214,12 @@ private fun PokemonDetailScreenContentPreview() {
                         PokemonTypeUiModel(label = "ELECTRIC", style = PokemonTypeStyle.ELECTRIC),
                     ),
                     stats = listOf(
-                        PokemonStatUiModel(label = "Hp", value = 35, progress = 35 / 255f, valueLabel = "35/255"),
+                        PokemonStatUiModel(
+                            label = "Hp",
+                            value = 35,
+                            progress = 35 / 255f,
+                            valueLabel = "35/255"
+                        ),
                     ),
                 ),
             ),
