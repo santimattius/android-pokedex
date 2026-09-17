@@ -5,9 +5,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.santimattius.pokedex.domain.Pokemon
-import com.santimattius.pokedex.domain.PokemonStat
-import com.santimattius.pokedex.domain.PokemonType
 import com.santimattius.pokedex.ui.component.BasicSkeletonContainer
 import org.junit.Rule
 import org.junit.Test
@@ -21,12 +18,12 @@ class PokemonDetailScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val pikachu = Pokemon(
+    private val pikachu = PokemonUiModel(
         id = 25,
-        name = "pikachu",
-        officialArtworkUrl = "https://example.com/25.png",
-        types = listOf(PokemonType("electric")),
-        stats = listOf(PokemonStat("hp", 35)),
+        displayName = "Pikachu",
+        imageUrl = "https://example.com/25.png",
+        types = listOf(PokemonTypeUiModel(label = "ELECTRIC", style = PokemonTypeStyle.ELECTRIC)),
+        stats = listOf(PokemonStatUiModel(label = "Hp", value = 35, progress = 35 / 255f)),
     )
 
     @Test
@@ -49,7 +46,9 @@ class PokemonDetailScreenTest {
         }
 
         composeTestRule.onNodeWithTag(PokemonDetailTestTags.CONTENT).assertExists()
-        composeTestRule.onNodeWithText("pikachu").assertExists()
+        composeTestRule.onNodeWithText("Pikachu").assertExists()
+        composeTestRule.onNodeWithText("ELECTRIC").assertExists()
+        composeTestRule.onNodeWithText("Hp: 35").assertExists()
         composeTestRule.onNodeWithTag(PokemonDetailTestTags.LOADING).assertDoesNotExist()
     }
 

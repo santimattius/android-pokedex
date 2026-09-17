@@ -31,6 +31,8 @@ class PokemonViewModelTest {
     @get:Rule
     val mainCoroutinesTestRule = MainCoroutinesTestRule()
 
+    private val mapper = PokemonUiMapper()
+
     private val pikachuResponse = PokemonResponse(
         id = 25,
         name = "pikachu",
@@ -42,7 +44,7 @@ class PokemonViewModelTest {
     @Test
     fun `initial state is Idle`() = runTest(mainCoroutinesTestRule.testDispatcher) {
         val repository = mockk<PokemonRepository>()
-        val viewModel = PokemonViewModel(repository)
+        val viewModel = PokemonViewModel(repository, mapper)
 
         assertEquals(PokemonUiState.Idle, viewModel.state.value)
     }
@@ -56,7 +58,7 @@ class PokemonViewModelTest {
                     pikachuResponse.toDomain()
                 }
             }
-            val viewModel = PokemonViewModel(repository)
+            val viewModel = PokemonViewModel(repository, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
@@ -70,7 +72,7 @@ class PokemonViewModelTest {
             val contentIndex = states.indexOfFirst { it is PokemonUiState.Content }
             assertTrue(loadingIndex < contentIndex)
             val content = states.last() as PokemonUiState.Content
-            assertEquals("pikachu", content.pokemon.name)
+            assertEquals("Pikachu", content.pokemon.displayName)
         }
 
     @Test
@@ -79,7 +81,7 @@ class PokemonViewModelTest {
             val repository = mockk<PokemonRepository> {
                 coEvery { getPokemon("pikachu") } returns pikachuResponse.toDomain()
             }
-            val viewModel = PokemonViewModel(repository)
+            val viewModel = PokemonViewModel(repository, mapper)
 
             viewModel.load("Pikachu")
             advanceUntilIdle()
@@ -97,7 +99,7 @@ class PokemonViewModelTest {
                     throw failure
                 }
             }
-            val viewModel = PokemonViewModel(repository)
+            val viewModel = PokemonViewModel(repository, mapper)
 
             val states = mutableListOf<PokemonUiState>()
             val job = launch { viewModel.state.toList(states) }
