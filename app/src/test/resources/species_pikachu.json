@@ -1,0 +1,11 @@
+{
+  "id": 25,
+  "name": "pikachu",
+  "capture_rate": 190,
+  "is_legendary": false,
+  "is_mythical": false,
+  "habitat": {
+    "name": "forest",
+    "url": "https://pokeapi.co/api/v2/pokemon-habitat/2/"
+  }
+}

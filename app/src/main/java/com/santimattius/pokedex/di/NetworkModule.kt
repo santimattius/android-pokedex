@@ -2,6 +2,7 @@ package com.santimattius.pokedex.di
 
 import com.santimattius.pokedex.core.networking.RetrofitServiceCreator
 import com.santimattius.pokedex.data.remote.PokemonService
+import com.santimattius.pokedex.data.remote.PokemonSpeciesService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,4 +15,8 @@ class NetworkModule {
     @Provides
     fun providePokemonService(creator: RetrofitServiceCreator): PokemonService =
         creator.create<PokemonService>()
+
+    @Provides
+    fun providePokemonSpeciesService(creator: RetrofitServiceCreator): PokemonSpeciesService =
+        creator.create<PokemonSpeciesService>()
 }

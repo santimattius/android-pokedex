@@ -6,6 +6,9 @@ data class PokemonUiModel(
     val imageUrl: String,
     val types: List<PokemonTypeUiModel>,
     val stats: List<PokemonStatUiModel>,
+    val totalBaseStats: Int = 0,
+    val captureDifficulty: String? = null,
+    val isSpecial: Boolean = false,
 )
 
 data class PokemonTypeUiModel(

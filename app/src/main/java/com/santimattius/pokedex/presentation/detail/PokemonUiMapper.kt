@@ -1,6 +1,7 @@
 package com.santimattius.pokedex.presentation.detail
 
 import com.santimattius.pokedex.domain.Pokemon
+import com.santimattius.pokedex.domain.PokemonProfile
 import com.santimattius.pokedex.domain.PokemonStat
 import com.santimattius.pokedex.domain.PokemonType
 import javax.inject.Inject
@@ -17,6 +18,12 @@ class PokemonUiMapper @Inject constructor() {
         imageUrl = pokemon.officialArtworkUrl,
         types = pokemon.types.map { it.toUiModel() },
         stats = pokemon.stats.map { it.toUiModel() },
+    )
+
+    fun map(profile: PokemonProfile): PokemonUiModel = map(profile.pokemon).copy(
+        totalBaseStats = profile.totalBaseStats,
+        captureDifficulty = profile.captureDifficulty.name,
+        isSpecial = profile.isSpecial,
     )
 
     private fun PokemonType.toUiModel(): PokemonTypeUiModel = PokemonTypeUiModel(

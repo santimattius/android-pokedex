@@ -1,6 +1,9 @@
 package com.santimattius.pokedex.presentation.detail
 
+import com.santimattius.pokedex.domain.CaptureDifficulty
 import com.santimattius.pokedex.domain.Pokemon
+import com.santimattius.pokedex.domain.PokemonProfile
+import com.santimattius.pokedex.domain.PokemonSpecies
 import com.santimattius.pokedex.domain.PokemonStat
 import com.santimattius.pokedex.domain.PokemonType
 import org.junit.Assert.assertEquals
@@ -88,6 +91,30 @@ class PokemonUiMapperTest {
         val result = mapper.map(pokemon)
 
         assertEquals(1f, result.stats.single().progress)
+    }
+
+    @Test
+    fun `map profile extends the base ui model with totalBaseStats, captureDifficulty and isSpecial`() {
+        val profile = PokemonProfile(
+            pokemon = pokemon(name = "pikachu"),
+            species = PokemonSpecies(
+                name = "pikachu",
+                habitat = "forest",
+                captureRate = 190,
+                isLegendary = false,
+                isMythical = false,
+            ),
+            totalBaseStats = 90,
+            captureDifficulty = CaptureDifficulty.EASY,
+            isSpecial = false,
+        )
+
+        val result = mapper.map(profile)
+
+        assertEquals("Pikachu", result.displayName)
+        assertEquals(90, result.totalBaseStats)
+        assertEquals("EASY", result.captureDifficulty)
+        assertEquals(false, result.isSpecial)
     }
 
     private fun pokemon(
